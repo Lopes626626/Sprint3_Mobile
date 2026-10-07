@@ -2,22 +2,53 @@
 
 A **Metaindústria** é uma plataforma integrada de monitoramento desenvolvida para o gerenciamento de registros e ocorrências em linhas de produção e maquinários industriais.
 
+**Problema:** Falta de rastreabilidade em tempo real de falhas e paradas em esteiras e equipamentos.
+**Entidade Principal:** Registro Industrial (Ocorrência), que armazena os dados de nome, descrição, status de criticidade e data.
+
 O projeto foi construído utilizando uma arquitetura moderna com **microsserviços**, integração completa entre **backend e frontend**, persistência de dados local e comunicação via API REST.
 
-Este projeto compõe os requisitos de entrega da **Sprint 3** da **FIAP**, unindo o Backend (construído na Sprint 1) com o App Mobile (construído na Sprint 2).
+Este projeto compõe os requisitos de **Entrega Final (Sprint 4)** da **FIAP**, unindo o Backend (construído na Sprint 1) com o App Mobile (construído na Sprint 2).
 
 ---
 
-# 🎯 O que foi feito na Sprint 3 (Integração)
+# 👥 Integrantes do Grupo
+
+| Nome | RM |
+|---|---|
+| Rafael Lopes Bestilleiro Benedetti | 554781 |
+| Breno Ferreira e Silva | 555503 |
+| Vinicius de Abreu Fernandes | 558184 |
+
+---
+
+# 🔗 Links do Projeto
+
+- **Backend (Spring Boot):** [Pasta do Backend](sprint1_API) ou [Repositório do Backend](https://github.com/Lopes626626/sprint1_API)
+- **Frontend (Expo):** [Pasta do Frontend](sprint_2) ou [Repositório do Frontend](https://github.com/Lopes626626/sprint_2)
+
+---
+
+# 🎯 O que foi feito na Entrega Final (Integração)
 
 Nesta etapa, o mock de dados do aplicativo foi totalmente removido. Realizamos a integração real entre as aplicações aplicando os seguintes requisitos:
 
 - **CORS Habilitado:** Configuração de `@CrossOrigin` no Spring Boot.
 - **Axios Configurado:** Instância base (`api.ts`) configurada com URL dinâmica, headers e timeout.
+- **BASE_URL Dinâmica:** Configurada para rodar de acordo com o ambiente (Web/iOS = `localhost:8080`, Emulador Android = `10.0.2.2:8080`, Aparelho Físico = `IP da máquina`).
 - **Camada de Serviços:** Separação da lógica de rede no frontend (`ocorrenciaService.ts`).
 - **Navegação (Stack):** Fluxo configurado no `App.tsx` conectando Lista, Cadastro e Detalhes.
 - **Assincronicidade:** Uso de `Promise.all` na listagem inicial, `useEffect` e `try/catch/finally` para tratamento de erros e resiliência.
 - **Tratamento de erros:** O aplicativo não quebra caso o backend esteja indisponível.
+
+---
+
+# 🔄 Fluxo de Telas e Endpoints
+
+O aplicativo segue estritamente a comunicação sem mocks no padrão **Tela ➔ Serviço ➔ Endpoint**:
+
+- **Listagem:** `ListaRegistrosScreen` ➔ `ocorrenciaService.listar()` ➔ **`GET /ocorrencias`**
+- **Detalhes:** `DetalheRegistroScreen` ➔ `ocorrenciaService.buscarPorId(id)` ➔ **`GET /ocorrencias/{id}`**
+- **Cadastro:** `CadastroRegistroScreen` ➔ `ocorrenciaService.criar(dados)` ➔ **`POST /ocorrencias`**
 
 ---
 
@@ -58,21 +89,9 @@ src/main/java/com/fiap/sprint1/backend_consultas/
 │   └── OcorrenciaRepository.java
 └── service/
     └── OcorrenciaService.java
+
 ```
-
-## 📌 Descrição dos Arquivos - Backend
-
-| Arquivo | Função |
-|---|---|
-| `BackendConsultasApplication.java` | Classe principal responsável pela inicialização da aplicação |
-| `OcorrenciaController.java` | Rotas REST para cadastro e listagem (com `@CrossOrigin`) |
-| `Ocorrencia.java` | Entidade JPA mapeada no banco de dados H2 |
-| `OcorrenciaRepository.java` | Interface responsável pela persistência |
-| `OcorrenciaService.java` | Camada de regras de negócio e CRUD |
-
----
-
-# 2️⃣ Frontend (Pasta: `sprint_2`)
+### 2️⃣ Frontend (Pasta: `sprint_2`)
 
 ```text
 sprint_2/
@@ -90,21 +109,6 @@ sprint_2/
     └── types/
         └── RegistroIndustrial.ts
 ```
-
-## 📌 Descrição dos Arquivos - Frontend
-
-| Arquivo | Função |
-|---|---|
-| `App.tsx` | Ponto de entrada do App, configurando o `NavigationContainer` e as rotas |
-| `RegistroCard.tsx` | Componente visual de UI para os cards de listagem |
-| `ListaRegistrosScreen.tsx` | Tela inicial (GET + `useEffect` + `Promise.all`) listando dados reais |
-| `CadastroRegistroScreen.tsx` | Tela de formulário via POST usando tipagem `Omit` para omitir o ID |
-| `DetalheRegistroScreen.tsx` | Tela de exibição detalhada baseada no ID (GET by ID) |
-| `api.ts` | Configuração da instância Axios com tratamento de IP/Localhost |
-| `ocorrenciaService.ts` | Centraliza as chamadas à API isolando a regra da interface |
-| `RegistroIndustrial.ts` | Interface do contrato de dados alinhada com o JSON da API |
-
----
 
 # ⚡ Configuração e Execução
 
@@ -195,3 +199,17 @@ Após iniciar o Expo, pressione no terminal:
 - `a` para abrir no emulador Android
 - `w` para abrir no Expo Web
 - Ou leia o QR Code no app Expo Go (celular físico)
+
+---
+
+# 🧪 Como Testar e Comprovar a Integração
+
+### 1. Cadastro no App e Verificação na API
+- Com as duas aplicações rodando, abra o aplicativo e adicione um novo registro na tela de Cadastro. 
+- O aplicativo salvará o dado com sucesso e recarregará a lista. 
+- Acesse o navegador no endereço `http://localhost:8080/ocorrencias` e verifique que o JSON atualizado foi persistido com sucesso na API.
+
+### 2. Tratamento de Falhas (Backend Parado)
+- Desligue a aplicação Spring Boot no seu terminal.
+- Acesse o aplicativo e tente recarregar a lista ou salvar um novo dado.
+- **Resultado:** Os dados não chegarão e o aplicativo não sofrerá *crash*. Em vez disso, mostrará um estado de erro visível (loading/erro), comprovando o fim do uso de mocks.
