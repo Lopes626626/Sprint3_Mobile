@@ -18,7 +18,8 @@ Este projeto compõe os requisitos de **Entrega Final (Sprint 4)** da **FIAP**, 
 | Rafael Lopes Bestilleiro Benedetti | 554781 |
 | Breno Ferreira e Silva | 555503 |
 | Vinicius de Abreu Fernandes | 558184 |
-
+| Enzo Raddatz | 556312 |
+| Felipe Chiozzotto Gozzani | 554715 |
 ---
 
 # 🔗 Links do Projeto
